@@ -1,2 +1,8 @@
 target/
 .vscode/
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+*.tfplan
+.terraform.lock.hcl
