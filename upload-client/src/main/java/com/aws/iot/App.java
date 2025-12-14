@@ -11,17 +11,17 @@ import java.io.File;
 
 public class App {
     public static void main(String[] args) {
+        // Nom du bucket S3
+        String bucket = "ilies411-iot-traffic-input";
+        String folderPath = "iot-data";
 
-        String bucket = "iot-traffic-input";  
-        String folderPath = "iot-data";       
-
-        // URL de ta queue
-        String queueUrl = "https://sqs.us-east-1.amazonaws.com/772595554692/iot-queue1";
+        // URL de la queue
+        String queueUrl = "https://sqs.us-east-1.amazonaws.com/196036494548/iot-queue-1";
 
         File folder = new File(folderPath);
 
         if (!folder.exists() || !folder.isDirectory()) {
-            System.out.println("❌ Le dossier " + folderPath + " n'existe pas.");
+            System.out.println("Le dossier " + folderPath + " n'existe pas");
             return;
         }
 
@@ -33,18 +33,17 @@ public class App {
 
                 String key = file.getName();
 
-                // Vérifier si le fichier existe déjà dans S3
                 try {
                     s3.headObject(HeadObjectRequest.builder()
                             .bucket(bucket)
                             .key(key)
                             .build());
 
-                    System.out.println("⏭ Fichier déjà présent dans S3 → " + key + " (ignoré)");
+                    System.out.println("Fichier déjà présent dans S3 → " + key + " (ignoré)");
                     continue;
 
                 } catch (Exception ignored) {
-                    System.out.println("⬆ Nouveau fichier détecté : " + key);
+                    System.out.println("Nouveau fichier détecté : " + key);
                 }
 
                 // Upload du fichier
@@ -53,10 +52,9 @@ public class App {
                                 .bucket(bucket)
                                 .key(key)
                                 .build(),
-                        file.toPath()
-                );
+                        file.toPath());
 
-                System.out.println("✅ Upload terminé : " + key);
+                System.out.println("Upload terminé : " + key);
 
                 // Envoyer un message SQS au Summarize Worker
                 String jsonMessage = "{ \"bucket\": \"" + bucket + "\", \"key\": \"" + key + "\" }";
@@ -68,10 +66,13 @@ public class App {
 
                 sqs.sendMessage(sqsRequest);
 
-                System.out.println("📨 Message SQS envoyé pour : " + key);
+                System.out.println("Message SQS envoyé pour : " + key);
             }
         }
 
-        System.out.println("\n🎉 Tous les nouveaux fichiers ont été uploadés et envoyés à SQS !");
+        System.out.println("\nTous les nouveaux fichiers ont été uploadés et envoyés à SQS");
+
+        s3.close();
+        sqs.close();
     }
 }
