@@ -14,12 +14,12 @@ resource "aws_s3_bucket" "tf_iot_input" {
 # SQS Queues
 ############################
 resource "aws_sqs_queue" "tf_iot_queue_1" {
-  name                      = "tf-iot-queue-1"
+  name                      = "iot-queue-1"
   visibility_timeout_seconds = 30
 }
 
 resource "aws_sqs_queue" "tf_iot_queue_2" {
-  name                      = "tf-iot-queue-2"
+  name                      = "iot-queue-2"
   visibility_timeout_seconds = 30
 }
 
@@ -52,7 +52,7 @@ resource "aws_iam_role_policy_attachment" "tf_lambda_basic_execution" {
 # Lambda Functions
 ############################
 resource "aws_lambda_function" "tf_summarize_worker" {
-  function_name = "tf-summarize-worker"
+  function_name = "summarize-worker"
   role          = aws_iam_role.tf_lambda_role.arn
   handler       = "com.aws.iot.SummarizeWorker::handleRequest" 
   runtime       = "java17"                        
@@ -60,7 +60,7 @@ resource "aws_lambda_function" "tf_summarize_worker" {
 }
 
 resource "aws_lambda_function" "tf_consolidator_worker" {
-  function_name = "tf-consolidator-worker"
+  function_name = "consolidator-worker"
   role          = aws_iam_role.tf_lambda_role.arn
   handler       = "com.aws.iot.ConsolidatorWorker::handleRequest"
   runtime       = "java17"
